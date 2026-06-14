@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boston Marathon Pace Adjustment for Heat & Humidity | Pace Forecast</title>
+  <meta name="description" content="Running Boston on a warm day? Use this calculator to adjust your goal pace for race-day heat and humidity. See your adjusted pace and mile splits instantly." />
+  <link rel="canonical" href="https://paceforecast.com/boston-marathon-pace-heat" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://paceforecast.com/boston-marathon-pace-heat" />
+  <meta property="og:title" content="Boston Marathon Pace Adjustment for Heat & Humidity | Pace Forecast" />
+  <meta property="og:description" content="Running Boston on a warm day? Use this calculator to adjust your goal pace for race-day heat and humidity. See your adjusted pace and mile splits instantly." />
+  <meta property="og:image" content="https://paceforecast.com/og.svg" />
+  <meta property="og:site_name" content="Pace Forecast" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Boston Marathon Pace Adjustment for Heat & Humidity | Pace Forecast" />
+  <meta name="twitter:description" content="Running Boston on a warm day? Use this calculator to adjust your goal pace for race-day heat and humidity. See your adjusted pace and mile splits instantly." />
+  <meta name="twitter:image" content="https://paceforecast.com/og.svg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Boston Marathon Pace Calculator — Warm Weather Adjustment",
+    "description": "Running Boston on a warm day? Use this calculator to adjust your goal pace for race-day heat and humidity. See your adjusted pace and mile splits instantly.",
+    "url": "https://paceforecast.com/boston-marathon-pace-heat",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Pace Forecast",
+      "url": "https://paceforecast.com"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --bg: #0b1120; --card: #131c2e; --border: #25334d;
+      --text: #e8eef7; --muted: #93a3bd; --accent: #2dd4bf;
+      color-scheme: dark;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .site-header {
+      background: #0f172a; border-bottom: 1px solid var(--border);
+      padding: 14px 24px; display: flex; align-items: center; gap: 10px;
+    }
+    .site-header a { color: var(--text); font-weight: 800; font-size: 18px; }
+
+    .wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px 64px; }
+
+    h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; margin: 0 0 20px; letter-spacing: -0.02em; }
+    h2 { font-size: 20px; font-weight: 700; margin: 40px 0 12px; color: var(--accent); }
+    h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+    p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
+
+    .intro { font-size: 16px; color: var(--text); border-left: 3px solid var(--accent); padding-left: 16px; margin-bottom: 32px; }
+
+    .conditions-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 32px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center;
+    }
+    .cond-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .cond-value { font-size: 28px; font-weight: 800; font-family: ui-monospace, monospace; color: var(--text); }
+    .cond-unit { font-size: 13px; color: var(--muted); }
+
+    .cta-block { text-align: center; margin: 32px 0 40px; }
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(180deg, #2dd4bf, #14b8a6);
+      color: #06231f; font-weight: 800; font-size: 16px;
+      padding: 14px 32px; border-radius: 10px; text-decoration: none;
+      transition: opacity .15s;
+    }
+    .cta-btn:hover { opacity: .9; text-decoration: none; }
+    .cta-sub { margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+    ul { padding-left: 20px; color: var(--muted); font-size: 15px; }
+    ul li { margin-bottom: 8px; }
+
+    .faq-item { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
+    .faq-item h3 { color: var(--text); }
+
+    .site-footer {
+      border-top: 1px solid var(--border); padding: 24px; text-align: center;
+      font-size: 12px; color: var(--muted);
+    }
+
+    @media (max-width: 480px) {
+      .conditions-box { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .cond-value { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <span>🏃</span>
+    <a href="https://paceforecast.com">Pace Forecast</a>
+  </header>
+
+  <div class="wrap">
+    <h1>Boston Marathon Pace Calculator — Warm Weather Adjustment</h1>
+
+    <p class="intro">The Boston Marathon course from Hopkinton to Boylston Street is one of the most storied in the world — but April weather is notoriously unpredictable. When temperatures climb above 60 °F (15 °C), even well-trained runners need to ease their goal pace to run a smart, negative-split race.</p>
+
+    <div class="conditions-box">
+      <div>
+        <div class="cond-label">Temperature</div>
+        <div class="cond-value">72°</div>
+        <div class="cond-unit">Fahrenheit</div>
+      </div>
+      <div>
+        <div class="cond-label">Humidity</div>
+        <div class="cond-value">75%</div>
+        <div class="cond-unit">relative</div>
+      </div>
+      <div>
+        <div class="cond-label">Altitude</div>
+        <div class="cond-value">100</div>
+        <div class="cond-unit">feet</div>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <a class="cta-btn" href="https://paceforecast.com/?pace=8%3A00&temp=72&humidity=75&alt=100">Calculate My Adjusted Pace →</a>
+      <p class="cta-sub">Pre-filled with the conditions above. Change any value to match your race forecast.</p>
+    </div>
+
+    <h2>Key Facts</h2>
+    <ul>
+        <li>Race-day temps above 65 °F (18 °C) can slow recreational runners by 4–8% and elites by 2–4%.</li>
+        <li>The Boston Athletic Association officially recommends slowing your start pace when temps exceed 55 °F.</li>
+        <li>The net downhill profile of Boston means many runners go out too fast — heat amplifies the risk of a second-half blow-up.</li>
+        <li>High humidity matters as much as temperature. At 75% humidity and 72 °F the effective heat stress exceeds 80 °F dry-bulb.</li>
+    </ul>
+
+    <h2>Race Day Tips</h2>
+    <ul>
+        <li>Seed yourself one corral back and run the first 5 miles 15–20 seconds per mile slower than goal.</li>
+        <li>Pre-cool with ice in the 30 minutes before the gun — it buys measurable time in warm races.</li>
+        <li>Focus on effort on Heartbreak Hill rather than pace; your GPS split will be slower regardless.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    
+      <div class="faq-item">
+        <h3>How much slower should I run Boston in the heat?</h3>
+        <p>A rough rule: add 20–30 seconds per mile for every 10 °F above 55 °F (13 °C). For a 72 °F day with 75% humidity that can be 40–60 seconds per mile. Use the calculator above for a precise estimate based on your goal pace.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does the Boston course elevation affect pace?</h3>
+        <p>The net drop of ~450 feet is mostly in the first half. The altitude is near sea level throughout, so the main environmental variable on race day is heat and humidity rather than altitude.</p>
+      </div>
+
+    <div class="cta-block" style="margin-top:48px">
+      <a class="cta-btn" href="https://paceforecast.com/?pace=8%3A00&temp=72&humidity=75&alt=100">Open the Calculator →</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>
+      <a href="https://paceforecast.com">Pace Forecast</a> — Environmental Running Pace Calculator
+      &nbsp;·&nbsp; Estimates are a planning aid; individual results vary.
+    </p>
+  </footer>
+</body>
+</html>

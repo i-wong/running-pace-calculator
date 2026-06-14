@@ -6,7 +6,8 @@
   "description": "Adjust your running goal pace for temperature, humidity, and altitude.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/generate-pages.mjs && tsc -b && vite build",
+    "generate": "node scripts/generate-pages.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
   },

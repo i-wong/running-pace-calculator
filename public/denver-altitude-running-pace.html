@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Denver Altitude Running Pace Calculator — Mile High Adjustment | Pace Forecast</title>
+  <meta name="description" content="Calculate how much slower you will run at Denver's 5,280 ft elevation. Get your altitude-adjusted pace and race splits for the Mile High City." />
+  <link rel="canonical" href="https://paceforecast.com/denver-altitude-running-pace" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://paceforecast.com/denver-altitude-running-pace" />
+  <meta property="og:title" content="Denver Altitude Running Pace Calculator — Mile High Adjustment | Pace Forecast" />
+  <meta property="og:description" content="Calculate how much slower you will run at Denver's 5,280 ft elevation. Get your altitude-adjusted pace and race splits for the Mile High City." />
+  <meta property="og:image" content="https://paceforecast.com/og.svg" />
+  <meta property="og:site_name" content="Pace Forecast" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Denver Altitude Running Pace Calculator — Mile High Adjustment | Pace Forecast" />
+  <meta name="twitter:description" content="Calculate how much slower you will run at Denver's 5,280 ft elevation. Get your altitude-adjusted pace and race splits for the Mile High City." />
+  <meta name="twitter:image" content="https://paceforecast.com/og.svg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Running Pace at Altitude — Denver & Mile High Adjustment",
+    "description": "Calculate how much slower you will run at Denver's 5,280 ft elevation. Get your altitude-adjusted pace and race splits for the Mile High City.",
+    "url": "https://paceforecast.com/denver-altitude-running-pace",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Pace Forecast",
+      "url": "https://paceforecast.com"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --bg: #0b1120; --card: #131c2e; --border: #25334d;
+      --text: #e8eef7; --muted: #93a3bd; --accent: #2dd4bf;
+      color-scheme: dark;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .site-header {
+      background: #0f172a; border-bottom: 1px solid var(--border);
+      padding: 14px 24px; display: flex; align-items: center; gap: 10px;
+    }
+    .site-header a { color: var(--text); font-weight: 800; font-size: 18px; }
+
+    .wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px 64px; }
+
+    h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; margin: 0 0 20px; letter-spacing: -0.02em; }
+    h2 { font-size: 20px; font-weight: 700; margin: 40px 0 12px; color: var(--accent); }
+    h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+    p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
+
+    .intro { font-size: 16px; color: var(--text); border-left: 3px solid var(--accent); padding-left: 16px; margin-bottom: 32px; }
+
+    .conditions-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 32px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center;
+    }
+    .cond-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .cond-value { font-size: 28px; font-weight: 800; font-family: ui-monospace, monospace; color: var(--text); }
+    .cond-unit { font-size: 13px; color: var(--muted); }
+
+    .cta-block { text-align: center; margin: 32px 0 40px; }
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(180deg, #2dd4bf, #14b8a6);
+      color: #06231f; font-weight: 800; font-size: 16px;
+      padding: 14px 32px; border-radius: 10px; text-decoration: none;
+      transition: opacity .15s;
+    }
+    .cta-btn:hover { opacity: .9; text-decoration: none; }
+    .cta-sub { margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+    ul { padding-left: 20px; color: var(--muted); font-size: 15px; }
+    ul li { margin-bottom: 8px; }
+
+    .faq-item { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
+    .faq-item h3 { color: var(--text); }
+
+    .site-footer {
+      border-top: 1px solid var(--border); padding: 24px; text-align: center;
+      font-size: 12px; color: var(--muted);
+    }
+
+    @media (max-width: 480px) {
+      .conditions-box { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .cond-value { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <span>🏃</span>
+    <a href="https://paceforecast.com">Pace Forecast</a>
+  </header>
+
+  <div class="wrap">
+    <h1>Running Pace at Altitude — Denver & Mile High Adjustment</h1>
+
+    <p class="intro">Denver sits at exactly 5,280 feet (1,609 m) above sea level — the "Mile High City." At that altitude, the air contains roughly 17% less oxygen than at sea level. Runners who live and train near sea level typically run 3–5% slower at Denver's elevation, with the effect most pronounced in longer aerobic efforts like half marathons and marathons.</p>
+
+    <div class="conditions-box">
+      <div>
+        <div class="cond-label">Temperature</div>
+        <div class="cond-value">60°</div>
+        <div class="cond-unit">Fahrenheit</div>
+      </div>
+      <div>
+        <div class="cond-label">Humidity</div>
+        <div class="cond-value">30%</div>
+        <div class="cond-unit">relative</div>
+      </div>
+      <div>
+        <div class="cond-label">Altitude</div>
+        <div class="cond-value">5,280</div>
+        <div class="cond-unit">feet</div>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <a class="cta-btn" href="https://paceforecast.com/?pace=8%3A00&temp=60&humidity=30&alt=5280">Calculate My Adjusted Pace →</a>
+      <p class="cta-sub">Pre-filled with the conditions above. Change any value to match your race forecast.</p>
+    </div>
+
+    <h2>Key Facts</h2>
+    <ul>
+        <li>At 5,280 ft there is about 17% less oxygen per breath than at sea level.</li>
+        <li>VO2max drops roughly 1.5–3% per 1,000 feet above ~3,000 ft.</li>
+        <li>Altitude effects are most pronounced in paces that rely heavily on aerobic capacity (half marathon, marathon) and least in short sprint efforts.</li>
+        <li>Acclimatization begins within 24–48 hours but full aerobic adaptation takes 2–4 weeks.</li>
+        <li>Dehydration risk is higher at altitude — dry Colorado air increases respiratory moisture loss.</li>
+    </ul>
+
+    <h2>Race Day Tips</h2>
+    <ul>
+        <li>Arrive at least 3 days before your race OR arrive within 24 hours and race before full altitude effects set in (the first ~12 hours you still have your sea-level blood composition).</li>
+        <li>Slow your easy and long runs by 30–60 seconds per mile during the first week at altitude.</li>
+        <li>Drink an extra 500–750 ml of water per day to compensate for increased respiratory fluid loss.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    
+      <div class="faq-item">
+        <h3>How much slower will I run in Denver vs sea level?</h3>
+        <p>A sea-level runner typically runs 3–5% slower at 5,280 ft for distances of 5K and longer. For an 8:00/mi runner that is roughly 15–25 seconds per mile. Use the calculator above with altitude 5280 ft and your goal pace for a precise estimate.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does altitude affect shorter races like 5K?</h3>
+        <p>Yes, but less than longer races. The aerobic cost is the same; it just matters more when you're racing for 30+ minutes. A 5K racer might lose 2–3%; a marathoner might lose 4–6% or more if not acclimatized.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Should I adjust my marathon pace for the Colfax or Revel Canyon City race?</h3>
+        <p>Yes — both are run at or above Denver's elevation. Use this calculator with the race altitude and forecast temperature to get a realistic goal pace before race day.</p>
+      </div>
+
+    <div class="cta-block" style="margin-top:48px">
+      <a class="cta-btn" href="https://paceforecast.com/?pace=8%3A00&temp=60&humidity=30&alt=5280">Open the Calculator →</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>
+      <a href="https://paceforecast.com">Pace Forecast</a> — Environmental Running Pace Calculator
+      &nbsp;·&nbsp; Estimates are a planning aid; individual results vary.
+    </p>
+  </footer>
+</body>
+</html>

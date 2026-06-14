@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chicago Marathon Pace Calculator — Heat & Humidity | Pace Forecast</title>
+  <meta name="description" content="Plan your Chicago Marathon pace with this environmental calculator. Adjust for race-day temperature and humidity — get splits from 5K to finish." />
+  <link rel="canonical" href="https://paceforecast.com/chicago-marathon-pace-calculator" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://paceforecast.com/chicago-marathon-pace-calculator" />
+  <meta property="og:title" content="Chicago Marathon Pace Calculator — Heat & Humidity | Pace Forecast" />
+  <meta property="og:description" content="Plan your Chicago Marathon pace with this environmental calculator. Adjust for race-day temperature and humidity — get splits from 5K to finish." />
+  <meta property="og:image" content="https://paceforecast.com/og.svg" />
+  <meta property="og:site_name" content="Pace Forecast" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chicago Marathon Pace Calculator — Heat & Humidity | Pace Forecast" />
+  <meta name="twitter:description" content="Plan your Chicago Marathon pace with this environmental calculator. Adjust for race-day temperature and humidity — get splits from 5K to finish." />
+  <meta name="twitter:image" content="https://paceforecast.com/og.svg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Chicago Marathon Pace Adjustment for Fall Race Conditions",
+    "description": "Plan your Chicago Marathon pace with this environmental calculator. Adjust for race-day temperature and humidity — get splits from 5K to finish.",
+    "url": "https://paceforecast.com/chicago-marathon-pace-calculator",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Pace Forecast",
+      "url": "https://paceforecast.com"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --bg: #0b1120; --card: #131c2e; --border: #25334d;
+      --text: #e8eef7; --muted: #93a3bd; --accent: #2dd4bf;
+      color-scheme: dark;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .site-header {
+      background: #0f172a; border-bottom: 1px solid var(--border);
+      padding: 14px 24px; display: flex; align-items: center; gap: 10px;
+    }
+    .site-header a { color: var(--text); font-weight: 800; font-size: 18px; }
+
+    .wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px 64px; }
+
+    h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; margin: 0 0 20px; letter-spacing: -0.02em; }
+    h2 { font-size: 20px; font-weight: 700; margin: 40px 0 12px; color: var(--accent); }
+    h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+    p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
+
+    .intro { font-size: 16px; color: var(--text); border-left: 3px solid var(--accent); padding-left: 16px; margin-bottom: 32px; }
+
+    .conditions-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 32px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center;
+    }
+    .cond-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .cond-value { font-size: 28px; font-weight: 800; font-family: ui-monospace, monospace; color: var(--text); }
+    .cond-unit { font-size: 13px; color: var(--muted); }
+
+    .cta-block { text-align: center; margin: 32px 0 40px; }
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(180deg, #2dd4bf, #14b8a6);
+      color: #06231f; font-weight: 800; font-size: 16px;
+      padding: 14px 32px; border-radius: 10px; text-decoration: none;
+      transition: opacity .15s;
+    }
+    .cta-btn:hover { opacity: .9; text-decoration: none; }
+    .cta-sub { margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+    ul { padding-left: 20px; color: var(--muted); font-size: 15px; }
+    ul li { margin-bottom: 8px; }
+
+    .faq-item { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
+    .faq-item h3 { color: var(--text); }
+
+    .site-footer {
+      border-top: 1px solid var(--border); padding: 24px; text-align: center;
+      font-size: 12px; color: var(--muted);
+    }
+
+    @media (max-width: 480px) {
+      .conditions-box { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .cond-value { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <span>🏃</span>
+    <a href="https://paceforecast.com">Pace Forecast</a>
+  </header>
+
+  <div class="wrap">
+    <h1>Chicago Marathon Pace Adjustment for Fall Race Conditions</h1>
+
+    <p class="intro">The Chicago Marathon in October can range from brisk and perfect to unseasonably warm. The flat course rewards good pacing — but even mild heat and humidity on an exposed urban course can cost you minutes at the finish. Use this calculator to dial in your race-day targets before you pin on your bib.</p>
+
+    <div class="conditions-box">
+      <div>
+        <div class="cond-label">Temperature</div>
+        <div class="cond-value">65°</div>
+        <div class="cond-unit">Fahrenheit</div>
+      </div>
+      <div>
+        <div class="cond-label">Humidity</div>
+        <div class="cond-value">65%</div>
+        <div class="cond-unit">relative</div>
+      </div>
+      <div>
+        <div class="cond-label">Altitude</div>
+        <div class="cond-value">600</div>
+        <div class="cond-unit">feet</div>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <a class="cta-btn" href="https://paceforecast.com/?pace=8%3A30&temp=65&humidity=65&alt=600">Calculate My Adjusted Pace →</a>
+      <p class="cta-sub">Pre-filled with the conditions above. Change any value to match your race forecast.</p>
+    </div>
+
+    <h2>Key Facts</h2>
+    <ul>
+        <li>Chicago sits at ~600 ft elevation — essentially no altitude penalty, making heat the dominant variable.</li>
+        <li>The 2007 Chicago Marathon was cancelled mid-race due to heat; temps were just 88 °F — a reminder that warm October days are real.</li>
+        <li>The flat course means there is nowhere to "bank" time early; bad pacing shows up ruthlessly.</li>
+        <li>Humidity in Chicago in October typically runs 60–75%, enough to meaningfully amplify even moderate heat.</li>
+    </ul>
+
+    <h2>Race Day Tips</h2>
+    <ul>
+        <li>Treat miles 1–6 as a warm-up regardless of crowd energy. The real race starts at mile 20.</li>
+        <li>Plan your fueling around sweat rate — even at 65 °F you can lose 1–1.5L per hour.</li>
+        <li>Watch the wet-bulb globe temperature forecast, not just the dry-bulb temp.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    
+      <div class="faq-item">
+        <h3>What is a good target pace for Chicago Marathon?</h3>
+        <p>That depends on your fitness and the conditions. Enter your goal pace and the forecast conditions in the calculator above to get a weather-adjusted target. On a cool (<55 °F) day you can run close to your training pace; at 65 °F with humidity add 3–5%.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does Chicago Marathon have shade?</h3>
+        <p>The course through the Loop and lakefront has some shade from buildings and trees, but large stretches are exposed. Wind off Lake Michigan can help or hurt depending on direction.</p>
+      </div>
+
+    <div class="cta-block" style="margin-top:48px">
+      <a class="cta-btn" href="https://paceforecast.com/?pace=8%3A30&temp=65&humidity=65&alt=600">Open the Calculator →</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>
+      <a href="https://paceforecast.com">Pace Forecast</a> — Environmental Running Pace Calculator
+      &nbsp;·&nbsp; Estimates are a planning aid; individual results vary.
+    </p>
+  </footer>
+</body>
+</html>

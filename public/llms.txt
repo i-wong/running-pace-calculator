@@ -1,0 +1,50 @@
+# Pace Forecast
+
+> Free running pace calculator that adjusts your goal pace for race-day temperature, humidity, and altitude.
+
+## What this tool does
+
+Pace Forecast answers the question: "Given my goal pace in training conditions, how should I adjust it for different race-day conditions?"
+
+It accounts for three environmental factors:
+- **Temperature** — heat slows runners quadratically above ~10 °C (50 °F)
+- **Humidity** — high humidity amplifies the heat penalty by reducing sweat evaporation
+- **Altitude** — thinner air above ~300 m adds a roughly linear aerobic cost
+
+A key feature is **acclimatization credit**: if a runner normally trains in warm or high-altitude conditions, they carry adaptation that offsets some of the race-day penalty. The tool lets users enter both their race conditions and their home training conditions, then computes the net adjustment.
+
+## Output
+
+- Adjusted race-day pace (min/mi or min/km)
+- Percentage slowdown and per-unit time delta
+- Breakdown: heat cost, altitude cost, acclimatization credit
+- Full splits table: 100 m, 200 m, 400 m, 800 m, 1 km, 1 mile, 5 km, 10 km, half marathon, marathon
+
+## Who it's for
+
+Runners planning road races — especially those who train in one climate and race in another (e.g., Pacific Northwest training → warm summer half marathon; sea-level training → Denver altitude race).
+
+## Model
+
+`adjusted_pace = goal_pace × (1 + cost(race_env)) / (1 + cost(acclimated_env))`
+
+Heat cost grows with the square of degrees above ~10 °C, amplified by humidity above 50%. Altitude cost is ~0.235% per 100 m above 300 m. Coefficients are practitioner estimates synthesised from commonly cited heat/altitude running guidance (Daniels' tables, heat-slowdown charts). This is a planning aid, not a physiological guarantee.
+
+## URL deep-link format
+
+Pre-fill the calculator with URL params:
+`https://paceforecast.com/?pace=8:00&temp=85&humidity=80&alt=0&accTemp=55&accHumidity=65&accAlt=200`
+
+Params (all optional, all in imperial by default):
+- `pace` — goal pace as m:ss (e.g. `8:00`)
+- `temp` — race temperature in °F
+- `humidity` — race humidity 0–100
+- `alt` — race altitude in feet
+- `accTemp` — acclimated temperature in °F
+- `accHumidity` — acclimated humidity 0–100
+- `accAlt` — acclimated altitude in feet
+
+## Source
+
+- GitHub: https://github.com/i-wong/running-pace-calculator
+- Live tool: https://paceforecast.com

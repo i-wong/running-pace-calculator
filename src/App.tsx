@@ -26,20 +26,49 @@ function toEnv(v: EnvValues, tempUnit: TempUnit, altUnit: AltUnit): Env {
   }
 }
 
+/**
+ * Read optional URL search params so landing pages can deep-link into the
+ * calculator with conditions pre-filled.
+ * e.g. ?pace=8:00&temp=85&humidity=80&alt=0&accTemp=55&accHumidity=65&accAlt=200
+ * All values are in imperial units (°F, feet).
+ */
+function readParams() {
+  const p = new URLSearchParams(window.location.search)
+  const num = (key: string, fallback: number) => {
+    const v = Number(p.get(key))
+    return Number.isFinite(v) ? v : fallback
+  }
+  return {
+    pace: p.get('pace') ?? '8:00',
+    race: {
+      temp: num('temp', 78),
+      humidity: num('humidity', 70),
+      alt: num('alt', 200),
+    } satisfies EnvValues,
+    acc: {
+      temp: num('accTemp', 50),
+      humidity: num('accHumidity', 60),
+      alt: num('accAlt', 150),
+    } satisfies EnvValues,
+  }
+}
+
+const INIT = readParams()
+
 export default function App() {
   const [tab, setTab] = useState<Tab>('race')
 
-  // Units
+  // Units — always start in imperial; landing pages supply °F / feet
   const [paceUnit, setPaceUnit] = useState<PaceUnit>('mile')
   const [tempUnit, setTempUnit] = useState<TempUnit>('F')
   const [altUnit, setAltUnit] = useState<AltUnit>('ft')
 
   // Goal pace (string so the field can be edited freely)
-  const [paceInput, setPaceInput] = useState('8:00')
+  const [paceInput, setPaceInput] = useState(INIT.pace)
 
   // Environments, stored in the active display units.
-  const [raceEnv, setRaceEnv] = useState<EnvValues>({ temp: 78, humidity: 70, alt: 200 })
-  const [accEnv, setAccEnv] = useState<EnvValues>({ temp: 50, humidity: 60, alt: 150 })
+  const [raceEnv, setRaceEnv] = useState<EnvValues>(INIT.race)
+  const [accEnv, setAccEnv] = useState<EnvValues>(INIT.acc)
 
   const basePaceSec = parseClock(paceInput)
   const paceValid = basePaceSec !== null && basePaceSec > 0
