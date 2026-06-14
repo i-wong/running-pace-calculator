@@ -419,6 +419,10 @@ function buildPage(page) {
   <meta name="twitter:description" content="${page.metaDesc}" />
   <meta name="twitter:image" content="${BASE_URL}/og.svg" />
 
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8701757095230799"
+       crossorigin="anonymous"></script>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
