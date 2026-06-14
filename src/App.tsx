@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Segmented } from './components/Segmented'
 import { EnvironmentForm, type EnvValues } from './components/EnvironmentForm'
 import { ResultDisplay } from './components/ResultDisplay'
 import { SplitsTable } from './components/SplitsTable'
 import { adjustPace, type Env } from './lib/paceModel'
-import { parseClock, formatPace } from './lib/format'
+import { parseClock } from './lib/format'
 import {
   cToF,
   fToC,
@@ -56,14 +56,29 @@ export default function App() {
   const [tempUnit, setTempUnit] = useState<TempUnit>('F')
   const [altUnit, setAltUnit] = useState<AltUnit>('ft')
 
+  const minRef = useRef<HTMLInputElement>(null)
+  const secRef = useRef<HTMLInputElement>(null)
+
   // Lazy initialisers so readParams() runs inside the component, avoiding
   // stale module-level state during HMR.
-  const [paceInput, setPaceInput] = useState(() => readParams().pace)
+  const [paceMin, setPaceMin] = useState<string>(() => {
+    const s = parseClock(readParams().pace)
+    return s !== null ? String(Math.floor(s / 60)) : '8'
+  })
+  const [paceSec, setPaceSec] = useState<string>(() => {
+    const s = parseClock(readParams().pace)
+    return s !== null ? String(Math.round(s % 60)).padStart(2, '0') : '00'
+  })
   const [raceEnv, setRaceEnv] = useState<EnvValues>(() => readParams().race)
   const [accEnv, setAccEnv] = useState<EnvValues>(() => readParams().acc)
 
-  const basePaceSec = parseClock(paceInput)
-  const paceValid = basePaceSec !== null && basePaceSec > 0
+  const minNum = Number(paceMin)
+  const secNum = Number(paceSec)
+  const paceValid =
+    paceMin !== '' && paceSec !== '' &&
+    minNum >= 1 && minNum <= 59 &&
+    secNum >= 0 && secNum <= 59
+  const basePaceSec: number | null = paceValid ? minNum * 60 + secNum : null
 
   const switchTempUnit = (next: TempUnit) => {
     if (next === tempUnit) return
@@ -84,7 +99,9 @@ export default function App() {
   const switchPaceUnit = (next: PaceUnit) => {
     if (next === paceUnit || basePaceSec === null) return
     const factor = next === 'km' ? 1000 / 1609.344 : 1609.344 / 1000
-    setPaceInput(formatPace(basePaceSec * factor))
+    const newSec = Math.round(basePaceSec * factor)
+    setPaceMin(String(Math.floor(newSec / 60)))
+    setPaceSec(String(newSec % 60).padStart(2, '0'))
     setPaceUnit(next)
   }
 
@@ -120,13 +137,46 @@ export default function App() {
               <span className="field__label">Goal pace</span>
               <div className="paceinput">
                 <input
-                  className={'paceinput__field mono' + (paceValid ? '' : ' is-invalid')}
+                  ref={minRef}
+                  className={'paceinput__seg mono' + (!paceValid && paceMin === '' ? ' is-invalid' : '')}
                   type="text"
                   inputMode="numeric"
-                  placeholder="8:00"
-                  value={paceInput}
-                  onChange={(e) => setPaceInput(e.target.value)}
-                  aria-label="Goal pace, minutes per distance unit"
+                  pattern="[0-9]*"
+                  maxLength={2}
+                  placeholder="8"
+                  value={paceMin}
+                  autoComplete="off"
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 2)
+                    setPaceMin(val)
+                    if (val.length === 2) secRef.current?.focus()
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  aria-label="Pace minutes"
+                />
+                <span className="paceinput__colon mono">:</span>
+                <input
+                  ref={secRef}
+                  className={'paceinput__seg mono' + (!paceValid && paceSec === '' ? ' is-invalid' : '')}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={2}
+                  placeholder="00"
+                  value={paceSec}
+                  autoComplete="off"
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 2)
+                    setPaceSec(val)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Backspace' && paceSec === '') minRef.current?.focus()
+                  }}
+                  onBlur={() => {
+                    if (paceSec.length === 1) setPaceSec(paceSec.padStart(2, '0'))
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  aria-label="Pace seconds"
                 />
                 <Segmented
                   ariaLabel="Pace unit"
@@ -138,9 +188,6 @@ export default function App() {
                   onChange={switchPaceUnit}
                 />
               </div>
-              {!paceValid && (
-                <span className="field__error">Enter pace as m:ss, e.g. 8:00</span>
-              )}
             </label>
 
             <div className="unitbar">

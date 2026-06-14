@@ -107,27 +107,34 @@ body {
 }
 .paceinput {
   display: flex;
-  gap: 8px;
-  align-items: stretch;
+  gap: 6px;
+  align-items: center;
 }
-.paceinput__field {
-  flex: 1;
-  min-width: 0;
+.paceinput__seg {
+  width: 56px;
   font-size: 28px;
   font-weight: 700;
-  padding: 8px 10px;
+  padding: 8px 4px;
   background: #0a1322;
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
   text-align: center;
 }
-.paceinput__field:focus {
+.paceinput__seg:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.18);
 }
-.paceinput__field.is-invalid { border-color: var(--slower); }
+.paceinput__seg.is-invalid { border-color: var(--slower); }
+.paceinput__colon {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--muted);
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 0;
+}
 
 .unitbar {
   display: flex;
@@ -429,7 +436,8 @@ input[type='range'].control__slider::-moz-range-thumb {
   .card { padding: 10px; }
   .panel { padding: 9px 10px; margin-bottom: 10px; }
   .paceinput-row { gap: 8px; }
-  .paceinput__field { font-size: 24px; padding: 7px 8px; }
+  .paceinput__seg { font-size: 24px; padding: 7px 4px; width: 50px; }
+  .paceinput__colon { font-size: 24px; }
   .tabs { margin-bottom: 10px; }
   .envform { gap: 13px; }
   .control__number { font-size: 16px; width: 56px; }
