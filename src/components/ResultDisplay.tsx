@@ -6,10 +6,9 @@ interface ResultDisplayProps {
   basePaceSec: number
   result: AdjustResult
   paceUnit: PaceUnit
-  /** Heading above the big number, e.g. "Race-day pace". */
   title: string
-  /** Whether to show the acclimatization baseline row. */
-  showBaseline?: boolean
+  /** When true, show net (delta-based) breakdown instead of raw race cost. */
+  isAcclimatized?: boolean
 }
 
 export function ResultDisplay({
@@ -17,12 +16,19 @@ export function ResultDisplay({
   result,
   paceUnit,
   title,
-  showBaseline = false,
+  isAcclimatized = false,
 }: ResultDisplayProps) {
   const slowerPct = (result.factor - 1) * 100
   const isSlower = result.deltaSec >= 0.5
   const isFaster = result.deltaSec <= -0.5
   const unitLabel = `/${paceUnit}`
+
+  const heatVal = isAcclimatized ? result.netHeatCost : result.raceCost.heat
+  const altVal = isAcclimatized ? result.netAltCost : result.raceCost.altitude
+  const heatLabel = isAcclimatized ? 'Heat shock (vs training climate)' : 'Heat cost (temp + humidity)'
+  const altLabel = isAcclimatized ? 'Altitude gain (vs training)' : 'Altitude cost'
+
+  const fmtPct = (v: number) => `${v >= 0 ? '+' : ''}${(v * 100).toFixed(1)}%`
 
   return (
     <div className="result">
@@ -50,25 +56,16 @@ export function ResultDisplay({
       <div className="result__rows">
         <div className="result__row">
           <span>Your goal pace</span>
-          <span className="mono">
-            {formatPace(basePaceSec)}
-            {unitLabel}
-          </span>
+          <span className="mono">{formatPace(basePaceSec)}{unitLabel}</span>
         </div>
-        <div className="result__row">
-          <span>Heat cost (temp + humidity)</span>
-          <span className="mono">+{(result.raceCost.heat * 100).toFixed(1)}%</span>
+        <div className={`result__row${heatVal < 0 ? ' result__row--credit' : ''}`}>
+          <span>{heatLabel}</span>
+          <span className="mono">{fmtPct(heatVal)}</span>
         </div>
-        <div className="result__row">
-          <span>Altitude cost</span>
-          <span className="mono">+{(result.raceCost.altitude * 100).toFixed(1)}%</span>
+        <div className={`result__row${altVal < 0 ? ' result__row--credit' : ''}`}>
+          <span>{altLabel}</span>
+          <span className="mono">{fmtPct(altVal)}</span>
         </div>
-        {showBaseline && (
-          <div className="result__row result__row--credit">
-            <span>Acclimatization credit</span>
-            <span className="mono">−{(result.acclimatedCost.total * 100).toFixed(1)}%</span>
-          </div>
-        )}
       </div>
     </div>
   )

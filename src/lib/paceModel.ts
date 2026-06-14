@@ -2,20 +2,22 @@
 // Environmental pace-adjustment model
 // -----------------------------------------------------------------------------
 //
-// The model expresses how much *slower* a runner gets under a given set of
-// conditions as a fractional "performance cost" relative to ideal racing
-// weather (cool, dry, sea level). A cost of 0.06 means ~6% slower.
+// Without acclimatization data, the model applies the raw cost of racing
+// in a given environment vs ideal conditions (cool, dry, sea level).
 //
-// adjusted_pace = base_pace * (1 + cost(race_env)) / (1 + cost(acclimated_env))
+// When training conditions are provided the model uses a DELTA approach:
+// what matters is the JUMP from training conditions to race conditions.
 //
-// The acclimated environment matters because a goal pace is something you can
-// actually hit in *your* normal training conditions — not in a physiology lab.
-// If you train in warm, humid, or high-altitude conditions you carry a built-in
-// adaptation, so we divide it back out before applying the race-day cost.
+//   - Race warmer/higher than training → pay the cost of that delta
+//   - Race cooler/lower than training  → partial credit for heat/alt adaptation
 //
-// These coefficients are practitioner estimates synthesised from commonly cited
-// heat/altitude running guidance (Daniels' tables, runner heat-slowdown charts).
-// They are a planning aid, not a physiological guarantee — individuals vary.
+// This correctly models, e.g., a runner trained in 45 °F slowing MORE in a
+// 60 °F race than a runner trained in 55 °F — because the jump is larger even
+// though neither training temp incurs an absolute heat penalty vs ideal.
+//
+// Coefficients are practitioner estimates from commonly cited heat/altitude
+// running guidance (Daniels' tables, heat-slowdown charts).
+// Planning aid only — individual response varies.
 
 export interface Env {
   /** Temperature in degrees Celsius. */
@@ -66,22 +68,21 @@ export function envCost(env: Env): CostBreakdown {
 }
 
 export interface AdjustResult {
-  /** Adjusted pace, in the same time unit as basePaceSec. */
   adjustedPaceSec: number
-  /** Multiplier applied to the base pace (e.g. 1.06 = 6% slower). */
   factor: number
-  /** Per-pace-unit slowdown in seconds (can be negative if conditions improve). */
   deltaSec: number
   raceCost: CostBreakdown
   acclimatedCost: CostBreakdown
+  /** Net heat adjustment after accounting for training climate (can be negative = benefit). */
+  netHeatCost: number
+  /** Net altitude adjustment after accounting for training altitude. */
+  netAltCost: number
 }
 
 /**
- * Adjust a base pace for race-day conditions, optionally crediting the runner's
- * acclimatization. When `acclimated` is omitted the runner is assumed to be
- * adapted to ideal conditions.
- *
- * @param basePaceSec  goal pace in seconds per distance unit (km or mile)
+ * Adjust a base pace for current conditions, optionally crediting the runner's
+ * training climate. When `acclimated` is omitted the runner is assumed to be
+ * adapted to ideal conditions (equivalent to the simple case).
  */
 export function adjustPace(
   basePaceSec: number,
@@ -90,13 +91,40 @@ export function adjustPace(
 ): AdjustResult {
   const raceCost = envCost(race)
   const acclimatedCost = envCost(acclimated)
-  const factor = (1 + raceCost.total) / (1 + acclimatedCost.total)
+
+  // Heat: base the cost on the TEMPERATURE JUMP from training to race.
+  // A runner trained at 45°F jumping to 60°F suffers more than one trained
+  // at 55°F, even though 45°F has zero absolute heat cost vs ideal.
+  const tempDeltaC = race.tempC - acclimated.tempC
+  let netHeatCost: number
+  if (tempDeltaC >= 0) {
+    // Racing warmer than training: pay cost of that delta above ideal threshold.
+    netHeatCost = heatCost(IDEAL.tempC + tempDeltaC, race.humidity)
+  } else {
+    // Racing cooler than training: get 50% credit for heat adaptation.
+    netHeatCost = raceCost.heat - acclimatedCost.heat * 0.5
+    netHeatCost = Math.max(-0.04, netHeatCost) // cap benefit at 4%
+  }
+
+  // Altitude: same delta logic.
+  const altDeltaM = race.altM - acclimated.altM
+  let netAltCost: number
+  if (altDeltaM >= 0) {
+    netAltCost = altitudeCost(altDeltaM)
+  } else {
+    netAltCost = Math.max(-0.04, -altitudeCost(Math.abs(altDeltaM)) * 0.5)
+  }
+
+  const factor = 1 + netHeatCost + netAltCost
   const adjustedPaceSec = basePaceSec * factor
+
   return {
     adjustedPaceSec,
     factor,
     deltaSec: adjustedPaceSec - basePaceSec,
     raceCost,
     acclimatedCost,
+    netHeatCost,
+    netAltCost,
   }
 }

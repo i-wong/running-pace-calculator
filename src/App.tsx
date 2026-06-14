@@ -15,9 +15,8 @@ import {
   type TempUnit,
 } from './lib/units'
 
-type Tab = 'race' | 'acclimated' | 'splits'
+type Tab = 'conditions' | 'splits'
 
-/** Convert display-unit env values to the metric Env the model expects. */
 function toEnv(v: EnvValues, tempUnit: TempUnit, altUnit: AltUnit): Env {
   return {
     tempC: tempUnit === 'F' ? fToC(v.temp) : v.temp,
@@ -26,16 +25,12 @@ function toEnv(v: EnvValues, tempUnit: TempUnit, altUnit: AltUnit): Env {
   }
 }
 
-/**
- * Read optional URL search params so landing pages can deep-link into the
- * calculator with conditions pre-filled.
- * e.g. ?pace=8:00&temp=85&humidity=80&alt=0&accTemp=55&accHumidity=65&accAlt=200
- * All values are in imperial units (°F, feet).
- */
 function readParams() {
   const p = new URLSearchParams(window.location.search)
   const num = (key: string, fallback: number) => {
-    const v = Number(p.get(key))
+    const raw = p.get(key)
+    if (raw === null) return fallback
+    const v = Number(raw)
     return Number.isFinite(v) ? v : fallback
   }
   return {
@@ -53,27 +48,23 @@ function readParams() {
   }
 }
 
-const INIT = readParams()
-
 export default function App() {
-  const [tab, setTab] = useState<Tab>('race')
+  const [tab, setTab] = useState<Tab>('conditions')
+  const [showAcc, setShowAcc] = useState(false)
 
-  // Units — always start in imperial; landing pages supply °F / feet
   const [paceUnit, setPaceUnit] = useState<PaceUnit>('mile')
   const [tempUnit, setTempUnit] = useState<TempUnit>('F')
   const [altUnit, setAltUnit] = useState<AltUnit>('ft')
 
-  // Goal pace (string so the field can be edited freely)
-  const [paceInput, setPaceInput] = useState(INIT.pace)
-
-  // Environments, stored in the active display units.
-  const [raceEnv, setRaceEnv] = useState<EnvValues>(INIT.race)
-  const [accEnv, setAccEnv] = useState<EnvValues>(INIT.acc)
+  // Lazy initialisers so readParams() runs inside the component, avoiding
+  // stale module-level state during HMR.
+  const [paceInput, setPaceInput] = useState(() => readParams().pace)
+  const [raceEnv, setRaceEnv] = useState<EnvValues>(() => readParams().race)
+  const [accEnv, setAccEnv] = useState<EnvValues>(() => readParams().acc)
 
   const basePaceSec = parseClock(paceInput)
   const paceValid = basePaceSec !== null && basePaceSec > 0
 
-  // --- Unit toggles convert existing values so physical meaning is preserved ---
   const switchTempUnit = (next: TempUnit) => {
     if (next === tempUnit) return
     const conv = (t: number) => (next === 'C' ? fToC(t) : cToF(t))
@@ -92,26 +83,23 @@ export default function App() {
 
   const switchPaceUnit = (next: PaceUnit) => {
     if (next === paceUnit || basePaceSec === null) return
-    // Rescale the pace number so the implied speed stays the same.
     const factor = next === 'km' ? 1000 / 1609.344 : 1609.344 / 1000
     setPaceInput(formatPace(basePaceSec * factor))
     setPaceUnit(next)
   }
 
-  // --- Results ---------------------------------------------------------------
   const results = useMemo(() => {
     if (basePaceSec === null) return null
     const race = toEnv(raceEnv, tempUnit, altUnit)
     const acc = toEnv(accEnv, tempUnit, altUnit)
     return {
-      simple: adjustPace(basePaceSec, race), // baseline = ideal conditions
-      acclimated: adjustPace(basePaceSec, race, acc), // baseline = your home conditions
+      simple: adjustPace(basePaceSec, race),
+      acclimated: adjustPace(basePaceSec, race, acc),
     }
   }, [basePaceSec, raceEnv, accEnv, tempUnit, altUnit])
 
-  const splitsPaceSec = results
-    ? results.acclimated.adjustedPaceSec
-    : basePaceSec ?? 0
+  const activeResult = results ? (showAcc ? results.acclimated : results.simple) : null
+  const splitsPaceSec = activeResult?.adjustedPaceSec ?? basePaceSec ?? 0
 
   return (
     <div className="app">
@@ -120,15 +108,15 @@ export default function App() {
           <span className="hero__mark">🏃</span> Pace Forecast
         </h1>
         <p className="hero__sub">
-          Adjust your goal pace for heat, humidity &amp; altitude — then plan your splits.
+          Adjust your pace for heat, humidity &amp; altitude.
         </p>
       </header>
 
       <main className="card">
-        {/* Goal pace + units (shared across all tabs) */}
+        {/* Goal pace + units */}
         <section className="panel">
-          <div className="panel__row">
-            <label className="field">
+          <div className="paceinput-row">
+            <label className="field field--inline">
               <span className="field__label">Goal pace</span>
               <div className="paceinput">
                 <input
@@ -154,37 +142,36 @@ export default function App() {
                 <span className="field__error">Enter pace as m:ss, e.g. 8:00</span>
               )}
             </label>
-          </div>
 
-          <div className="unitbar">
-            <Segmented
-              ariaLabel="Temperature unit"
-              options={[
-                { value: 'F', label: '°F' },
-                { value: 'C', label: '°C' },
-              ]}
-              value={tempUnit}
-              onChange={switchTempUnit}
-            />
-            <Segmented
-              ariaLabel="Altitude unit"
-              options={[
-                { value: 'ft', label: 'feet' },
-                { value: 'm', label: 'meters' },
-              ]}
-              value={altUnit}
-              onChange={switchAltUnit}
-            />
+            <div className="unitbar">
+              <Segmented
+                ariaLabel="Temperature unit"
+                options={[
+                  { value: 'F', label: '°F' },
+                  { value: 'C', label: '°C' },
+                ]}
+                value={tempUnit}
+                onChange={switchTempUnit}
+              />
+              <Segmented
+                ariaLabel="Altitude unit"
+                options={[
+                  { value: 'ft', label: 'ft' },
+                  { value: 'm', label: 'm' },
+                ]}
+                value={altUnit}
+                onChange={switchAltUnit}
+              />
+            </div>
           </div>
         </section>
 
         {/* Tabs */}
         <nav className="tabs">
           <Segmented
-            ariaLabel="Calculator section"
+            ariaLabel="Section"
             options={[
-              { value: 'race', label: 'Race conditions' },
-              { value: 'acclimated', label: 'Acclimatized to' },
+              { value: 'conditions', label: 'Current conditions' },
               { value: 'splits', label: 'Splits' },
             ]}
             value={tab}
@@ -192,51 +179,53 @@ export default function App() {
           />
         </nav>
 
-        {/* Tab content */}
-        {tab === 'race' && (
+        {tab === 'conditions' && (
           <section className="tabpanel">
-            <p className="tabpanel__lead">
-              Set the conditions you&apos;ll actually be racing in. We compare them to
-              ideal racing weather (cool &amp; dry, sea level).
-            </p>
             <EnvironmentForm
               values={raceEnv}
               onChange={setRaceEnv}
               tempUnit={tempUnit}
               altUnit={altUnit}
             />
-            {paceValid && results && (
-              <ResultDisplay
-                title="Race-day pace"
-                basePaceSec={basePaceSec}
-                result={results.simple}
-                paceUnit={paceUnit}
-              />
-            )}
-          </section>
-        )}
 
-        {tab === 'acclimated' && (
-          <section className="tabpanel">
-            <p className="tabpanel__lead">
-              Now tell us the conditions you train in and are <strong>most
-              acclimatized to</strong>. If your goal pace is realistic for{' '}
-              <em>your</em> home weather, we credit that adaptation back — so the
-              race-day estimate is more accurate than the simple version.
-            </p>
-            <EnvironmentForm
-              values={accEnv}
-              onChange={setAccEnv}
-              tempUnit={tempUnit}
-              altUnit={altUnit}
-            />
-            {paceValid && results && (
+            {/* Training climate toggle */}
+            <button
+              className={'acc-toggle-btn' + (showAcc ? ' is-open' : '')}
+              onClick={() => setShowAcc((v) => !v)}
+              aria-expanded={showAcc}
+            >
+              <span>
+                {showAcc ? '▾' : '▸'}&nbsp; My training climate
+                <span className="acc-toggle-badge">optional</span>
+              </span>
+              <span className="acc-toggle-hint">
+                {showAcc ? 'Hide' : 'Add for a better estimate'}
+              </span>
+            </button>
+
+            {showAcc && (
+              <div className="acc-panel">
+                <p className="acc-panel__lead">
+                  Set the conditions you normally train in. A runner adapted to 45 °F
+                  will feel 60 °F harder than one adapted to 55 °F — this accounts for
+                  that gap.
+                </p>
+                <EnvironmentForm
+                  values={accEnv}
+                  onChange={setAccEnv}
+                  tempUnit={tempUnit}
+                  altUnit={altUnit}
+                />
+              </div>
+            )}
+
+            {paceValid && activeResult && (
               <ResultDisplay
-                title="Acclimatization-adjusted race pace"
+                title={showAcc ? 'Adjusted for your training climate' : 'Adjusted pace'}
                 basePaceSec={basePaceSec}
-                result={results.acclimated}
+                result={activeResult}
                 paceUnit={paceUnit}
-                showBaseline
+                isAcclimatized={showAcc}
               />
             )}
           </section>
@@ -245,8 +234,9 @@ export default function App() {
         {tab === 'splits' && (
           <section className="tabpanel">
             <p className="tabpanel__lead">
-              Splits for your acclimatization-adjusted race pace. Switch the goal
-              pace or conditions on the other tabs to update these instantly.
+              {showAcc
+                ? 'Splits at your training-climate-adjusted pace.'
+                : 'Splits at your adjusted pace. Enable "My training climate" above for a more personalised estimate.'}
             </p>
             {paceValid ? (
               <SplitsTable paceSec={splitsPaceSec} paceUnit={paceUnit} />
@@ -259,9 +249,8 @@ export default function App() {
 
       <footer className="foot">
         <p>
-          Estimates are a planning aid based on common heat &amp; altitude running
-          guidance — individual response varies. On hot or high-altitude days, run
-          by effort first.
+          Estimates are a planning aid — individual response varies. On hot or
+          high-altitude days, run by effort first.
         </p>
       </footer>
     </div>
