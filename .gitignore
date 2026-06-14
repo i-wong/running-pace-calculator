@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vercel
+*.tsbuildinfo
+
+# Capacitor native projects (generated)
+/ios
+/android
