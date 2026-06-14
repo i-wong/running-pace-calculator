@@ -1,4 +1,4 @@
-# 🏃 Pace Lab — Environmental Pace Calculator
+# 🏃 Pace Forecast — Environmental Pace Calculator
 
 A modern, mobile-first React web app that converts a goal running pace into a
 realistic race-day pace based on **temperature, humidity, and altitude** — and
@@ -68,7 +68,7 @@ The build is a self-contained static bundle (`base: './'` in
 
 ```bash
 npm install @capacitor/core @capacitor/cli
-npx cap init "Pace Lab" com.example.pacelab --web-dir=dist
+npx cap init "Pace Forecast" com.paceforecast.app --web-dir=dist
 npm run build
 npm install @capacitor/ios @capacitor/android
 npx cap add ios

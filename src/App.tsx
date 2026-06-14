@@ -88,7 +88,7 @@ export default function App() {
     <div className="app">
       <header className="hero">
         <h1 className="hero__title">
-          <span className="hero__mark">🏃</span> Pace Lab
+          <span className="hero__mark">🏃</span> Pace Forecast
         </h1>
         <p className="hero__sub">
           Adjust your goal pace for heat, humidity &amp; altitude — then plan your splits.
