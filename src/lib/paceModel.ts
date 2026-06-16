@@ -37,6 +37,26 @@ export interface CostBreakdown {
 /** Conditions considered "ideal" for racing — the zero-cost reference point. */
 export const IDEAL: Env = { tempC: 10, humidity: 45, altM: 0 }
 
+export type Intensity = 'easy' | 'steady' | 'marathon' | 'halfMarathon' | 'threshold' | '10k' | '5k'
+
+export const INTENSITIES: Intensity[] = ['easy', 'steady', 'marathon', 'halfMarathon', 'threshold', '10k', '5k']
+
+export const INTENSITY_INFO: Record<Intensity, {
+  label: string
+  abbr: string
+  description: string
+  /** Fraction of the heat penalty that applies at this effort level. */
+  heatMultiplier: number
+}> = {
+  easy:         { label: 'Easy',          abbr: 'Easy',   description: 'Conversational, very low effort — body self-regulates',         heatMultiplier: 0.10 },
+  steady:       { label: 'Steady',        abbr: 'Steady', description: 'Comfortable aerobic, could hold a conversation',                heatMultiplier: 0.40 },
+  marathon:     { label: 'Marathon',      abbr: 'MP',     description: 'Goal marathon race pace (26.2 mi / 42.2 km)',                   heatMultiplier: 0.60 },
+  halfMarathon: { label: 'Half Marathon', abbr: 'HMP',    description: 'Goal half marathon race pace (13.1 mi / 21.1 km)',              heatMultiplier: 0.75 },
+  threshold:    { label: 'Threshold',     abbr: 'Tempo',  description: 'Comfortably hard, lactate threshold pace',                      heatMultiplier: 0.85 },
+  '10k':        { label: '10K',           abbr: '10K',    description: 'Goal 10 km race pace',                                          heatMultiplier: 0.93 },
+  '5k':         { label: '5K',            abbr: '5K',     description: 'Goal 5 km race pace — maximum heat effect',                     heatMultiplier: 1.00 },
+}
+
 // --- Tunable coefficients ----------------------------------------------------
 const HEAT_THRESHOLD_C = 10 // No heat penalty at or below this temperature.
 const HEAT_QUADRATIC = 0.0003 // cost grows with the square of degrees above threshold.
@@ -81,13 +101,17 @@ export interface AdjustResult {
 
 /**
  * Adjust a base pace for current conditions, optionally crediting the runner's
- * training climate. When `acclimated` is omitted the runner is assumed to be
- * adapted to ideal conditions (equivalent to the simple case).
+ * training climate and effort intensity.
+ *
+ * `intensity` scales the heat penalty — at easy effort the body self-regulates
+ * and absorbs heat stress better; at 5K pace every degree counts.
+ * Altitude is not scaled by intensity (O2 availability affects all efforts).
  */
 export function adjustPace(
   basePaceSec: number,
   race: Env,
   acclimated: Env = IDEAL,
+  intensity: Intensity = '5k',
 ): AdjustResult {
   const raceCost = envCost(race)
   const acclimatedCost = envCost(acclimated)
@@ -115,7 +139,8 @@ export function adjustPace(
     netAltCost = Math.max(-0.04, -altitudeCost(Math.abs(altDeltaM)) * 0.5)
   }
 
-  const factor = 1 + netHeatCost + netAltCost
+  const effectiveHeatCost = netHeatCost * INTENSITY_INFO[intensity].heatMultiplier
+  const factor = 1 + effectiveHeatCost + netAltCost
   const adjustedPaceSec = basePaceSec * factor
 
   return {
@@ -124,7 +149,7 @@ export function adjustPace(
     deltaSec: adjustedPaceSec - basePaceSec,
     raceCost,
     acclimatedCost,
-    netHeatCost,
+    netHeatCost: effectiveHeatCost,
     netAltCost,
   }
 }

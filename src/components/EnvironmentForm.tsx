@@ -15,6 +15,7 @@ interface EnvironmentFormProps {
   onChange: (next: EnvValues) => void
   tempUnit: TempUnit
   altUnit: AltUnit
+  fields?: ('temp' | 'humidity' | 'altitude')[]
 }
 
 function tempHint(temp: number, unit: TempUnit): string {
@@ -47,7 +48,9 @@ export function EnvironmentForm({
   onChange,
   tempUnit,
   altUnit,
+  fields = ['temp', 'humidity', 'altitude'],
 }: EnvironmentFormProps) {
+  const show = (f: 'temp' | 'humidity' | 'altitude') => fields.includes(f)
   const set = (patch: Partial<EnvValues>) => onChange({ ...values, ...patch })
 
   const tempRange =
@@ -62,35 +65,41 @@ export function EnvironmentForm({
 
   return (
     <div className="envform">
-      <ControlRow
-        icon="🌡️"
-        label="Temperature"
-        unit={`°${tempUnit}`}
-        value={values.temp}
-        {...tempRange}
-        onChange={(temp) => set({ temp })}
-        hint={tempHint(values.temp, tempUnit)}
-      />
-      <ControlRow
-        icon="💧"
-        label="Humidity"
-        unit="%"
-        value={values.humidity}
-        min={0}
-        max={100}
-        step={1}
-        onChange={(humidity) => set({ humidity })}
-        hint={humidityHint(values.humidity)}
-      />
-      <ControlRow
-        icon="⛰️"
-        label="Altitude"
-        unit={altUnit}
-        value={values.alt}
-        {...altRange}
-        onChange={(alt) => set({ alt })}
-        hint={altHint(values.alt, altUnit)}
-      />
+      {show('temp') && (
+        <ControlRow
+          icon="🌡️"
+          label="Temperature"
+          unit={`°${tempUnit}`}
+          value={values.temp}
+          {...tempRange}
+          onChange={(temp) => set({ temp })}
+          hint={tempHint(values.temp, tempUnit)}
+        />
+      )}
+      {show('humidity') && (
+        <ControlRow
+          icon="💧"
+          label="Humidity"
+          unit="%"
+          value={values.humidity}
+          min={0}
+          max={100}
+          step={1}
+          onChange={(humidity) => set({ humidity })}
+          hint={humidityHint(values.humidity)}
+        />
+      )}
+      {show('altitude') && (
+        <ControlRow
+          icon="⛰️"
+          label="Altitude"
+          unit={altUnit}
+          value={values.alt}
+          {...altRange}
+          onChange={(alt) => set({ alt })}
+          hint={altHint(values.alt, altUnit)}
+        />
+      )}
     </div>
   )
 }

@@ -3,7 +3,8 @@ import { Segmented } from './components/Segmented'
 import { EnvironmentForm, type EnvValues } from './components/EnvironmentForm'
 import { ResultDisplay } from './components/ResultDisplay'
 import { SplitsTable } from './components/SplitsTable'
-import { adjustPace, type Env } from './lib/paceModel'
+import { IntensityPicker } from './components/IntensityPicker'
+import { adjustPace, IDEAL, type Env, type Intensity } from './lib/paceModel'
 import { parseClock } from './lib/format'
 import {
   cToF,
@@ -15,7 +16,7 @@ import {
   type TempUnit,
 } from './lib/units'
 
-type Tab = 'conditions' | 'splits'
+type Tab = 'simple' | 'advanced' | 'splits'
 
 function toEnv(v: EnvValues, tempUnit: TempUnit, altUnit: AltUnit): Env {
   return {
@@ -49,8 +50,9 @@ function readParams() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>('conditions')
+  const [tab, setTab] = useState<Tab>('simple')
   const [showAcc, setShowAcc] = useState(false)
+  const [intensity, setIntensity] = useState<Intensity>('marathon')
 
   const [paceUnit, setPaceUnit] = useState<PaceUnit>('mile')
   const [tempUnit, setTempUnit] = useState<TempUnit>('F')
@@ -59,8 +61,6 @@ export default function App() {
   const minRef = useRef<HTMLInputElement>(null)
   const secRef = useRef<HTMLInputElement>(null)
 
-  // Lazy initialisers so readParams() runs inside the component, avoiding
-  // stale module-level state during HMR.
   const [paceMin, setPaceMin] = useState<string>(() => {
     const s = parseClock(readParams().pace)
     return s !== null ? String(Math.floor(s / 60)) : '8'
@@ -105,18 +105,33 @@ export default function App() {
     setPaceUnit(next)
   }
 
-  const results = useMemo(() => {
+  // Simple: temperature only, fixed humidity + sea level, no intensity scaling
+  const simpleResult = useMemo(() => {
+    if (basePaceSec === null) return null
+    const tempC = tempUnit === 'F' ? fToC(raceEnv.temp) : raceEnv.temp
+    return adjustPace(basePaceSec, { tempC, humidity: 60, altM: 0 })
+  }, [basePaceSec, raceEnv.temp, tempUnit])
+
+  // Advanced: full environment + acclimatization + intensity
+  const advancedResults = useMemo(() => {
     if (basePaceSec === null) return null
     const race = toEnv(raceEnv, tempUnit, altUnit)
     const acc = toEnv(accEnv, tempUnit, altUnit)
     return {
-      simple: adjustPace(basePaceSec, race),
-      acclimated: adjustPace(basePaceSec, race, acc),
+      base: adjustPace(basePaceSec, race, IDEAL, intensity),
+      acclimated: adjustPace(basePaceSec, race, acc, intensity),
     }
-  }, [basePaceSec, raceEnv, accEnv, tempUnit, altUnit])
+  }, [basePaceSec, raceEnv, accEnv, tempUnit, altUnit, intensity])
 
-  const activeResult = results ? (showAcc ? results.acclimated : results.simple) : null
-  const splitsPaceSec = activeResult?.adjustedPaceSec ?? basePaceSec ?? 0
+  const advancedResult = advancedResults
+    ? (showAcc ? advancedResults.acclimated : advancedResults.base)
+    : null
+
+  // Splits use the most detailed result available
+  const splitsPaceSec =
+    (advancedResult ?? simpleResult)?.adjustedPaceSec ?? basePaceSec ?? 0
+
+  const paceLabel = paceValid ? `${paceMin}:${paceSec}` : 'your pace'
 
   return (
     <div className="app">
@@ -130,7 +145,7 @@ export default function App() {
       </header>
 
       <main className="card">
-        {/* Goal pace + units */}
+        {/* Goal pace + units — shared across all tabs */}
         <section className="panel">
           <div className="paceinput-row">
             <label className="field field--inline">
@@ -200,15 +215,17 @@ export default function App() {
                 value={tempUnit}
                 onChange={switchTempUnit}
               />
-              <Segmented
-                ariaLabel="Altitude unit"
-                options={[
-                  { value: 'ft', label: 'ft' },
-                  { value: 'm', label: 'm' },
-                ]}
-                value={altUnit}
-                onChange={switchAltUnit}
-              />
+              {tab !== 'simple' && (
+                <Segmented
+                  ariaLabel="Altitude unit"
+                  options={[
+                    { value: 'ft', label: 'ft' },
+                    { value: 'm', label: 'm' },
+                  ]}
+                  value={altUnit}
+                  onChange={switchAltUnit}
+                />
+              )}
             </div>
           </div>
         </section>
@@ -218,7 +235,8 @@ export default function App() {
           <Segmented
             ariaLabel="Section"
             options={[
-              { value: 'conditions', label: 'Current conditions' },
+              { value: 'simple', label: 'Simple' },
+              { value: 'advanced', label: 'Advanced' },
               { value: 'splits', label: 'Splits' },
             ]}
             value={tab}
@@ -226,7 +244,38 @@ export default function App() {
           />
         </nav>
 
-        {tab === 'conditions' && (
+        {/* ── Simple tab ── */}
+        {tab === 'simple' && (
+          <section className="tabpanel">
+            <EnvironmentForm
+              values={raceEnv}
+              onChange={setRaceEnv}
+              tempUnit={tempUnit}
+              altUnit={altUnit}
+              fields={['temp']}
+            />
+            {paceValid && simpleResult && (
+              <>
+                <ResultDisplay
+                  title="Adjusted pace"
+                  basePaceSec={basePaceSec!}
+                  result={simpleResult}
+                  paceUnit={paceUnit}
+                  compact
+                />
+                <p className="simple-nudge">
+                  For humidity, altitude &amp; intensity adjustments →{' '}
+                  <button className="simple-nudge__link" onClick={() => setTab('advanced')}>
+                    Advanced
+                  </button>
+                </p>
+              </>
+            )}
+          </section>
+        )}
+
+        {/* ── Advanced tab ── */}
+        {tab === 'advanced' && (
           <section className="tabpanel">
             <EnvironmentForm
               values={raceEnv}
@@ -266,11 +315,20 @@ export default function App() {
               </div>
             )}
 
-            {paceValid && activeResult && (
+            {/* Intensity picker */}
+            <div className="intensity-section">
+              <IntensityPicker
+                value={intensity}
+                onChange={setIntensity}
+                paceLabel={paceLabel}
+              />
+            </div>
+
+            {paceValid && advancedResult && (
               <ResultDisplay
                 title={showAcc ? 'Adjusted for your training climate' : 'Adjusted pace'}
                 basePaceSec={basePaceSec!}
-                result={activeResult}
+                result={advancedResult}
                 paceUnit={paceUnit}
                 isAcclimatized={showAcc}
               />
@@ -278,12 +336,15 @@ export default function App() {
           </section>
         )}
 
+        {/* ── Splits tab ── */}
         {tab === 'splits' && (
           <section className="tabpanel">
             <p className="tabpanel__lead">
-              {showAcc
-                ? 'Splits at your training-climate-adjusted pace.'
-                : 'Splits at your adjusted pace. Enable "My training climate" above for a more personalised estimate.'}
+              {advancedResult
+                ? showAcc
+                  ? 'Splits at your training-climate-adjusted pace.'
+                  : 'Splits at your advanced adjusted pace.'
+                : 'Splits at your temperature-adjusted pace (Simple estimate).'}
             </p>
             {paceValid ? (
               <SplitsTable paceSec={splitsPaceSec} paceUnit={paceUnit} />

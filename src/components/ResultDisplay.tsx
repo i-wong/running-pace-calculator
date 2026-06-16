@@ -9,6 +9,8 @@ interface ResultDisplayProps {
   title: string
   /** When true, show net (delta-based) breakdown instead of raw race cost. */
   isAcclimatized?: boolean
+  /** When true, hide the per-factor breakdown rows. */
+  compact?: boolean
 }
 
 export function ResultDisplay({
@@ -17,6 +19,7 @@ export function ResultDisplay({
   paceUnit,
   title,
   isAcclimatized = false,
+  compact = false,
 }: ResultDisplayProps) {
   const slowerPct = (result.factor - 1) * 100
   const isSlower = result.deltaSec >= 0.5
@@ -53,20 +56,22 @@ export function ResultDisplay({
         </span>
       </div>
 
-      <div className="result__rows">
-        <div className="result__row">
-          <span>Your goal pace</span>
-          <span className="mono">{formatPace(basePaceSec)}{unitLabel}</span>
+      {!compact && (
+        <div className="result__rows">
+          <div className="result__row">
+            <span>Your goal pace</span>
+            <span className="mono">{formatPace(basePaceSec)}{unitLabel}</span>
+          </div>
+          <div className={`result__row${heatVal < 0 ? ' result__row--credit' : ''}`}>
+            <span>{heatLabel}</span>
+            <span className="mono">{fmtPct(heatVal)}</span>
+          </div>
+          <div className={`result__row${altVal < 0 ? ' result__row--credit' : ''}`}>
+            <span>{altLabel}</span>
+            <span className="mono">{fmtPct(altVal)}</span>
+          </div>
         </div>
-        <div className={`result__row${heatVal < 0 ? ' result__row--credit' : ''}`}>
-          <span>{heatLabel}</span>
-          <span className="mono">{fmtPct(heatVal)}</span>
-        </div>
-        <div className={`result__row${altVal < 0 ? ' result__row--credit' : ''}`}>
-          <span>{altLabel}</span>
-          <span className="mono">{fmtPct(altVal)}</span>
-        </div>
-      </div>
+      )}
     </div>
   )
 }
