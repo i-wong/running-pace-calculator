@@ -39,12 +39,12 @@ function readParams() {
     race: {
       temp: num('temp', 78),
       humidity: num('humidity', 70),
-      alt: num('alt', 200),
+      alt: num('alt', 0),
     } satisfies EnvValues,
     acc: {
       temp: num('accTemp', 50),
       humidity: num('accHumidity', 60),
-      alt: num('accAlt', 150),
+      alt: num('accAlt', 0),
     } satisfies EnvValues,
   }
 }
@@ -277,11 +277,21 @@ export default function App() {
         {/* ── Advanced tab ── */}
         {tab === 'advanced' && (
           <section className="tabpanel">
+            {/* Intensity first — defines what the pace means */}
+            <div className="intensity-section">
+              <IntensityPicker
+                value={intensity}
+                onChange={setIntensity}
+                paceLabel={paceLabel}
+              />
+            </div>
+
             <EnvironmentForm
               values={raceEnv}
               onChange={setRaceEnv}
               tempUnit={tempUnit}
               altUnit={altUnit}
+              dropdownFields={['humidity', 'altitude']}
             />
 
             {/* Training climate toggle */}
@@ -311,18 +321,10 @@ export default function App() {
                   onChange={setAccEnv}
                   tempUnit={tempUnit}
                   altUnit={altUnit}
+                  dropdownFields={['humidity', 'altitude']}
                 />
               </div>
             )}
-
-            {/* Intensity picker */}
-            <div className="intensity-section">
-              <IntensityPicker
-                value={intensity}
-                onChange={setIntensity}
-                paceLabel={paceLabel}
-              />
-            </div>
 
             {paceValid && advancedResult && (
               <ResultDisplay

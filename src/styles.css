@@ -225,6 +225,21 @@ body {
 .control__number:focus { outline: none; border-color: var(--accent); }
 .control__unit { color: var(--muted); font-size: 13px; width: 26px; }
 
+/* ---- Dropdown select (humidity & altitude in Advanced) ---- */
+.env-select {
+  width: 70px;
+  text-align: right;
+  font-size: 17px;
+  font-weight: 700;
+  background: #0a1322;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 5px 6px;
+  cursor: pointer;
+}
+.env-select:focus { outline: none; border-color: var(--accent); }
+
 input[type='range'].control__slider {
   -webkit-appearance: none;
   appearance: none;

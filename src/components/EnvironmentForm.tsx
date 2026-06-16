@@ -16,6 +16,51 @@ interface EnvironmentFormProps {
   tempUnit: TempUnit
   altUnit: AltUnit
   fields?: ('temp' | 'humidity' | 'altitude')[]
+  /** Render these fields as dropdowns instead of sliders. */
+  dropdownFields?: ('humidity' | 'altitude')[]
+}
+
+const HUMIDITY_OPTIONS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+const ALT_OPTIONS_FT = [0, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000, 12000]
+const ALT_OPTIONS_M  = [0, 150, 300,  600,  900, 1200, 1500, 1800, 2100, 2400, 3000,  3600]
+
+function snap(value: number, options: number[]): number {
+  return options.reduce((a, b) => Math.abs(b - value) < Math.abs(a - value) ? b : a)
+}
+
+function SelectRow({ icon, label, unit, value, options, onChange, hint }: {
+  icon: string
+  label: string
+  unit: string
+  value: number
+  options: number[]
+  onChange: (v: number) => void
+  hint?: string
+}) {
+  const snapped = snap(value, options)
+  return (
+    <div className="control">
+      <div className="control__head">
+        <span className="control__label">
+          <span className="control__icon" aria-hidden="true">{icon}</span>
+          {label}
+        </span>
+        <span className="control__valuebox">
+          <select
+            className="env-select mono"
+            value={snapped}
+            onChange={(e) => onChange(Number(e.target.value))}
+          >
+            {options.map((o) => (
+              <option key={o} value={o}>{o}</option>
+            ))}
+          </select>
+          <span className="control__unit">{unit}</span>
+        </span>
+      </div>
+      {hint && <p className="control__hint">{hint}</p>}
+    </div>
+  )
 }
 
 function tempHint(temp: number, unit: TempUnit): string {
@@ -49,8 +94,10 @@ export function EnvironmentForm({
   tempUnit,
   altUnit,
   fields = ['temp', 'humidity', 'altitude'],
+  dropdownFields = [],
 }: EnvironmentFormProps) {
   const show = (f: 'temp' | 'humidity' | 'altitude') => fields.includes(f)
+  const asDropdown = (f: 'humidity' | 'altitude') => dropdownFields.includes(f)
   const set = (patch: Partial<EnvValues>) => onChange({ ...values, ...patch })
 
   const tempRange =
@@ -62,6 +109,8 @@ export function EnvironmentForm({
     altUnit === 'ft'
       ? { min: 0, max: 13000, step: 100 }
       : { min: 0, max: 4000, step: 25 }
+
+  const altOptions = altUnit === 'ft' ? ALT_OPTIONS_FT : ALT_OPTIONS_M
 
   return (
     <div className="envform">
@@ -77,28 +126,52 @@ export function EnvironmentForm({
         />
       )}
       {show('humidity') && (
-        <ControlRow
-          icon="💧"
-          label="Humidity"
-          unit="%"
-          value={values.humidity}
-          min={0}
-          max={100}
-          step={1}
-          onChange={(humidity) => set({ humidity })}
-          hint={humidityHint(values.humidity)}
-        />
+        asDropdown('humidity') ? (
+          <SelectRow
+            icon="💧"
+            label="Humidity"
+            unit="%"
+            value={values.humidity}
+            options={HUMIDITY_OPTIONS}
+            onChange={(humidity) => set({ humidity })}
+            hint={humidityHint(snap(values.humidity, HUMIDITY_OPTIONS))}
+          />
+        ) : (
+          <ControlRow
+            icon="💧"
+            label="Humidity"
+            unit="%"
+            value={values.humidity}
+            min={0}
+            max={100}
+            step={1}
+            onChange={(humidity) => set({ humidity })}
+            hint={humidityHint(values.humidity)}
+          />
+        )
       )}
       {show('altitude') && (
-        <ControlRow
-          icon="⛰️"
-          label="Altitude"
-          unit={altUnit}
-          value={values.alt}
-          {...altRange}
-          onChange={(alt) => set({ alt })}
-          hint={altHint(values.alt, altUnit)}
-        />
+        asDropdown('altitude') ? (
+          <SelectRow
+            icon="⛰️"
+            label="Altitude"
+            unit={altUnit}
+            value={values.alt}
+            options={altOptions}
+            onChange={(alt) => set({ alt })}
+            hint={altHint(snap(values.alt, altOptions), altUnit)}
+          />
+        ) : (
+          <ControlRow
+            icon="⛰️"
+            label="Altitude"
+            unit={altUnit}
+            value={values.alt}
+            {...altRange}
+            onChange={(alt) => set({ alt })}
+            hint={altHint(values.alt, altUnit)}
+          />
+        )
       )}
     </div>
   )
