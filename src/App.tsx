@@ -269,7 +269,7 @@ export default function App() {
             {paceValid && activeResult && (
               <ResultDisplay
                 title={showAcc ? 'Adjusted for your training climate' : 'Adjusted pace'}
-                basePaceSec={basePaceSec}
+                basePaceSec={basePaceSec!}
                 result={activeResult}
                 paceUnit={paceUnit}
                 isAcclimatized={showAcc}
